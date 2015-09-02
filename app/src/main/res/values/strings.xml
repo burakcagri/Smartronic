@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Smartronic</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_rooms">Rooms</string>
+    <string name="title_activity_go_security">goSecurity</string>
+    <string name="title_activity_index">Index</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Home</string>
+    <string name="saloon">Saloon</string>
+    <string name="kitchen">Kitchen</string>
+    <string name="bedroom">Bedroom</string>
+    <string name="kidroom">Kidroom</string>
+    <string name="useful_in_future" formatted="false">you have %d useful strings in %.2f years</string>
+    <string name="settings_icon">&#xf085;</string>
+    <string name="missions_icon">&#xf0ae;</string>
+    <string name="rooms_icon">&#xf015;</string>
+    <string name="security_icon">&#xf071;</string>
+    <string name="on">On</string>
+    <string name="lamp_status">Lamp Status</string>
+    <string name="username">Username</string>
+    <string name="curtain">Curtain</string>
+    <string name="curtain1">Curtain 1</string>
+    <string name="curtain2">Curtain 2</string>
+    <string name="lamp1">Lamp 1</string>
+    <string name="lamp2">Lamp 2</string>
+    <string name="lamp3">Lamp 3</string>
+    <string name="heater">Heater</string>
+    <string name="plug1">Plug 1</string>
+    <string name="plug2">Plug 2</string>
+    <string name="plug3">Plug 3</string>
+    <string name="send_button">Send</string>
+    <string name="sign_in">Sign In</string>
+    <string name="logout">Logout</string>
+    <string name="password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="forgot">Forgot Your Password?</string>
+    <string name="hint_email">example@example.com</string>
+    <string name="password_reminder_text">Forgot Password</string>
+    <string name="missions">Missions</string>
+    <string name="settings">Settings</string>
+    <string name="quick_menu">Quick Menu</string>
+    <string name="overview">Overview</string>
+    <string name="rooms">Rooms</string>
+    <string name="security">Security</string>
+    <string name="status_ok">OK</string>
+    <string name="status_alert">Alert</string>
+    <string name="lamp_settings">Lamp Settings</string>
+    <string name="already">You are already in : </string>
+    <string name="an_error">An Error Occurred!</string>
+    <string name="predefined_variables">PredefinedVariables</string>
+    <string name="preferences_initial">PreferencesInitial</string>
+    <string name="URLLogin">https://vera-us-oem-autha.mios.com/autha/auth/username/</string>
+    <string name="getTheDevices">https://vera-us-oem-authd.mios.com/locator/locator/locator</string>
+    <string name="requestToGateway">https://vera-us-oem-device11.mios.com/device/device/device/</string>
+    <string name="usingRelayServer">device/device/device/</string>
+    <string name="sessionKeyServer">relay/relay/relay/device/</string>
+    <string name="mmsSession">/info/session/token</string>
+    <string name="verifyURL">/authd/auth/provision</string>
+    <string name="font_path">fonts/Walkway_Oblique_Bold.ttf</string>
+    <string name="pk_device">PK_Device</string>
+    <string name="internal_ip">InternalIp</string>
+    <string name="server_device">Server_Device</string>
+    <string name="server_relay">Server_Relay</string>
+    <string name="pk_account">PK_Account</string>
+    <string name="mobile">mobile</string>
+    <string name="wifi">WIFI</string>
+    <string name="last_pk_device">LAST_PK_Device</string>
+    <string name="hw_key">HWKey</string>
+    <string name="last_ip">LAST_IP</string>
+    <string name="last_wifi">LAST_WIFI</string>
+    <string name="last_engine_connect">LAST_ENGINE_CONNECT</string>
+    <string name="sha">SHA1Password</string>
+    <string name="pk_oem">PK_Oem</string>
+    <string name="app_key">AppKey</string>
+    <string name="room_status">RoomStatus</string>
+    <string name="new_target_value">newTargetValue</string>
+    <string name="action">action</string>
+    <string name="device_number">DeviceNum</string>
+    <string name="device_number2">Device_Num</string>
+    <string name="dataversion">dataversion</string>
+    <string name="min_delay">minimumdelay</string>
+    <string name="load_time">loadtime</string>
+    <string name="output_format">output_format</string>
+    <string name="loading">Loading..</string>
+    <string name="please_wait">Please Wait</string>
+    <string name="gateway_error">An Error Occurred While Trying To Login</string>
+
+    // Database Strings
+
+    <string name="user_table">user</string>
+    <string name="room_table">room</string>
+    <string name="home_table">home</string>
+    <string name="security_table">security</string>
+    <string name="heater_table">heater</string>
+    <string name="plug_table">plug</string>
+    <string name="database_name">Smartronic</string>
+    <string name="no_room">Sorry there are no rooms registered to your account..</string>
+    <string name="exit_the_app">Are you sure you want to exit?</string>
+    <string name="exit">Exit</string>
+    <string name="wish_exit">Do you wish to exit?</string>
+    <string name="returning">Returning..</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+
+    <!--
+     formatted strings will be useful in later chapters of android app
+     Resources resources = getResources();
+     String string = resources.getString(R.string.useful_in_future,5,0.5);
+    -->
+
+    <string name="title_activity_room">Room</string>
+    <string name="title_activity_sign_in">SignIn</string>
+    <string name="title_activity_forgot">Forgot</string>
+    <string name="title_activity_security">Security</string>
+    <string name="magnetic_contact_balcony">Magnetic Contact Balcony</string>
+    <string name="magnetic_contact_main_entrance">Magnetic Contact Main Entrance</string>
+    <string name="motion_sensor_saloon">Motion Sensor Saloon</string>
+    <string name="motion_sensor_hallway">Motion Sensor Hallway</string>
+    <string name="gas_leak_kitchen">Gas Leak Kitchen</string>
+    <string name="flood_bathroom">Flood Bathroom</string>
+    <string name="flood_kitchen">Flood Kitchen</string>
+    <string name="server_autha">vera-us-oem-autha.mios.com</string>
+    <string name="server_autha_alt">us-autha12.mios.com</string>
+    <string name="server_authd">vera-us-oem-authd.mios.com</string>
+    <string name="server_authd_alt">us-authd12.mios.com</string>
+    <string name="switch_power">urn:upnp-org:serviceId:SwitchPower1</string>
+    <string name="arm_sensor">urn:micasaverde-com:serviceId:SecuritySensor1</string>
+    <string name="dimming_service">urn:upnp-org:serviceId:Dimming1</string>
+    <string name="hvac_user_operating">urn:upnp-org:serviceId:HVAC_UserOperatingMode1</string>
+    <string name="hvac_fan_operating">urn:upnp-org:serviceId:HVAC_FanOperatingMode1</string>
+    <string name="hvac_temp_sensor">urn:upnp-org:serviceId:TemperatureSensor</string>
+    <string name="hvac_temp_set_point_heat">urn:upnp-org:serviceId:TemperatureSetpoint1_Heat</string>
+    <string name="hvac_temp_set_point_cool">urn:upnp-org:serviceId:TemperatureSetpoint1_Cool</string>
+    <string name="door_lock_service">urn:micasaverde-com:serviceId:DoorLock1</string>
+    <string name="get">GET</string>
+    <string name="post">POST</string>
+    <string name="identity">Identity</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="pick_gateway">Select A Gateway</string>
+
+
+</resources>
