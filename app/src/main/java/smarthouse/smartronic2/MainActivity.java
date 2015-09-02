@@ -43,6 +43,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+
 public class MainActivity extends ActionBarActivity {
 
     EditText ed1;
@@ -65,8 +67,8 @@ public class MainActivity extends ActionBarActivity {
     Boolean isStopped = false;
     String type = "";
     boolean indexAccess = false;
-    int pk_device = 0;
-    Integer[] PK_Devices;
+    String pk_device = "";
+    String[] PK_Devices, Internal_Ips;
     CharSequence[] items;
 
     //String URLLogin = "https://vera-us-oem-autha.mios.com/autha/auth/username/";
@@ -79,6 +81,7 @@ public class MainActivity extends ActionBarActivity {
     //String verifyURL = "/authd/auth/provision";
 
     LinkedHashMap<String, String> postData = new LinkedHashMap<>();
+    LoginCheck loginCheck = new LoginCheck();
 
     int say = 1;
 
@@ -87,6 +90,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         registerBroadcastReceiver();
+        registerUIReceiver();
         Methods methods = new Methods(getApplicationContext());
         final Database database = new Database(getApplicationContext());
 
@@ -240,7 +244,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showLoadingDialog();
+            //showLoadingDialog();
         }
 
         public void showLoadingDialog() {
@@ -261,7 +265,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            dismissLoadingDialog();
+            //dismissLoadingDialog();
             //new Polling(getApplicationContext()).execute();
         }
 
@@ -297,52 +301,7 @@ public class MainActivity extends ActionBarActivity {
 
                 System.out.println("DEVICES JSON ARRAY" + devices);
                 String PK_Device = processTheData(2, devices);
-                System.out.println("PK_Device " + PK_Device);
-
-                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preferences_initial), MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(getString(R.string.last_pk_device), PK_Device);
-                editor.apply();
-
-                postData.clear();
-
-                String server_relay_mmsSession = "";
-
-                if (InternalIp.equals("") || InternalIp == null) {
-                    StringBuilder sb = new StringBuilder("https://");
-                    sb.append(serverDevice);
-                    sb.append(URLMap.get("5"));
-                    sb.append(PK_Device);
-                    URLMap.put("5", sb);
-                    postData.put("", "");
-                    String response = handleURLConnections(URLMap.get("5"), postData, "1", "GET");
-                    if (responseCode == 200) {
-                        serverRelay = processTheData(3, response);
-
-                        postData.clear();
-
-                        StringBuilder stringBuilder = new StringBuilder("https://");
-                        stringBuilder.append(serverRelay);
-                        stringBuilder.append(URLMap.get("7"));
-                        URLMap.put("7", stringBuilder);
-                        postData.put("", "");
-                        String response2 = handleURLConnections(URLMap.get("7"), postData, "2", "GET");
-                        server_relay_mmsSession = processTheData(4, response2);
-
-                        postData.clear();
-                    } else {
-                        URLMap.put("4", URLMap.get("4").append(PK_Device).append("/port_3480"));
-                    }
-                } else {
-                    //Connect Locally
-                    URLMap.put("4", URLMap.get("4").append(InternalIp).append("/port_3480"));
-                }
-                StringBuilder stringBuilder = new StringBuilder("https://" + serverRelay + URLMap.get("6").toString() + PK_Device +
-                        "/session/" + server_relay_mmsSession + "port_3480/");
-                URLMap.put("6", stringBuilder);
-                postData.put("id", "sdata");
-                String dataResponse = handleURLConnections(URLMap.get("6"), postData, "1", "GET");
-                String processedDataResponse = processTheData(4, dataResponse);
+                System.out.println("PK_Device " + pk_device);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -371,7 +330,9 @@ public class MainActivity extends ActionBarActivity {
                 case "1":
                     try {
                         stringBuilder.append(inputUrl);
-                        stringBuilder.append("?");
+                        if (!linkedHashMap.isEmpty()) {
+                            stringBuilder.append("?");
+                        }
                         stringBuilder.append(postDataString(linkedHashMap).toString());
                         URL url = new URL(stringBuilder.toString());
                         System.out.println("URL Link is Here \n" + inputUrl.toString());
@@ -396,7 +357,7 @@ public class MainActivity extends ActionBarActivity {
 
                         while ((line = reader.readLine()) != null) {
                             stringBuilder2.append(line);
-                            System.out.println(stringBuilder2.toString());
+                            System.out.println("BASTI MI BURAYI" + stringBuilder2.toString());
                         }
                         reader.close();
 
@@ -493,12 +454,20 @@ public class MainActivity extends ActionBarActivity {
                     break;
                 case 2:
                     try {
-                        return selectGateway(text);
+                        selectGateway(text);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
                     break;
                 case 3:
+                    try {
+                        JSONObject jsonArray = new JSONObject(text);
+                        return (String) jsonArray.get(getString(R.string.server_relay));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 4:
                     try {
                         JSONObject jsonArray = new JSONObject(text);
                         return (String) jsonArray.get(getString(R.string.server_relay));
@@ -528,34 +497,43 @@ public class MainActivity extends ActionBarActivity {
             return result;
         }
 
-        private String selectGateway(String json) throws JSONException {
+        private void selectGateway(String json) throws JSONException {
 
             listView = (ListView) findViewById(R.id.gatewaysListView);
             JSONObject jsonObject = new JSONObject(json);
             JSONArray jsonArray = jsonObject.getJSONArray("Devices");
-            PK_Devices = new Integer[jsonArray.length()];
+            PK_Devices = new String[jsonArray.length()];
+            Internal_Ips = new String[jsonArray.length()];
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject1 = (JSONObject) jsonArray.get(i);
-                pk_device = (Integer) jsonObject1.get(getString(R.string.pk_device));
+                pk_device = String.valueOf(jsonObject1.get(getString(R.string.pk_device)));
+                Internal_Ips[i] = String.valueOf(jsonObject1.get(getString(R.string.internal_ip)));
                 PK_Devices[i] = pk_device;
             }
-
+            items = new CharSequence[PK_Devices.length];
             for (int i = 0; i < PK_Devices.length; i++) {
                 items[i] = String.valueOf(PK_Devices[i]);
                 System.out.println("Number " + i + " is: " + items[i]);
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle(R.string.pick_gateway)
-                    .setItems(items, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-
-                        }
-                    });
-            AlertDialog alert = builder.create();
-            alert.show();
-            return null;
+            Intent myIntent = new Intent("change_of_ui");
+            context.sendBroadcast(myIntent);
         }
+    }
+
+    private void changeUI() {
+        System.out.println("CHANGE OF UI METHOD WORKS");
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.pick_gateway)
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        pk_device = String.valueOf(items[which]);
+                        setInternalIp(Internal_Ips[which]);
+                        new LoginCheck2().execute();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
 
@@ -651,6 +629,12 @@ public class MainActivity extends ActionBarActivity {
         registerReceiver(myBroadcastReceiver, myIntentFilter);
     }
 
+    public void registerUIReceiver() {
+        IntentFilter myIntentFilter = new IntentFilter();
+        myIntentFilter.addAction("change_of_ui");
+        registerReceiver(myBroadcastReceiver, myIntentFilter);
+    }
+
     private BroadcastReceiver myBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -672,7 +656,11 @@ public class MainActivity extends ActionBarActivity {
                         Toast.makeText(context, "No Network", Toast.LENGTH_LONG).show();
                         connectionType("");
                     }
-                case "polling_update":
+                    break;
+                case "change_of_ui":
+                    System.out.println("CHANGE OF UI BROADCAST MESSAGE");
+                    changeUI();
+                    break;
             }
         }
     };
@@ -702,6 +690,61 @@ public class MainActivity extends ActionBarActivity {
         editor.putString(getString(R.string.last_engine_connect), last_engine_connect);
         editor.putString(getString(R.string.last_pk_device), last_pk_device);
         editor.apply();
+    }
+
+    class LoginCheck2 extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+
+            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preferences_initial), MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(getString(R.string.last_pk_device), pk_device);
+            editor.apply();
+
+            postData.clear();
+
+            String server_relay_mmsSession = "";
+            System.out.println("LOCAL CONNECTION IP " + InternalIp);
+
+            if (!InternalIp.equals("") || !InternalIp.equals(null)) {
+                StringBuilder sb = new StringBuilder("http://");
+                sb.append(InternalIp + "/");
+                sb.append(getString(R.string.port) + "/");
+                sb.append(getString(R.string.data_req));
+                postData.clear();
+                System.out.println("LOCAL CONNECTION URL " + sb.toString());
+                String response = loginCheck.handleURLConnections(sb, postData, "1", "GET");
+                System.out.println("THIS IS THE LOCAL CONNECTION RESPONSE: " + response);
+                if (responseCode == 200) {
+                    serverRelay = loginCheck.processTheData(3, response);
+
+                    postData.clear();
+
+                    StringBuilder stringBuilder = new StringBuilder("https://");
+                    stringBuilder.append(serverRelay);
+                    stringBuilder.append(URLMap.get("7"));
+                    URLMap.put("7", stringBuilder);
+                    postData.put("", "");
+                    String response2 = loginCheck.handleURLConnections(URLMap.get("7"), postData, "2", "GET");
+                    server_relay_mmsSession = loginCheck.processTheData(4, response2);
+
+                    postData.clear();
+                } else {
+                    URLMap.put("4", URLMap.get("4").append(String.valueOf(pk_device)).append("/port_3480"));
+                }
+            } else {
+                //Connect Locally
+                URLMap.put("4", URLMap.get("4").append(InternalIp).append("/port_3480"));
+            }
+            StringBuilder stringBuilder = new StringBuilder("https://" + serverRelay + URLMap.get("6").toString() + String.valueOf(pk_device) +
+                    "/session/" + server_relay_mmsSession + "port_3480/");
+            URLMap.put("6", stringBuilder);
+            postData.put("id", "sdata");
+            String dataResponse = loginCheck.handleURLConnections(URLMap.get("6"), postData, "1", "GET");
+            String processedDataResponse = loginCheck.processTheData(4, dataResponse);
+            return null;
+        }
     }
 }
 

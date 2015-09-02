@@ -61,7 +61,7 @@
     <string name="verifyURL">/authd/auth/provision</string>
     <string name="font_path">fonts/Walkway_Oblique_Bold.ttf</string>
     <string name="pk_device">PK_Device</string>
-    <string name="internal_ip">InternalIp</string>
+    <string name="internal_ip">InternalIP</string>
     <string name="server_device">Server_Device</string>
     <string name="server_relay">Server_Relay</string>
     <string name="pk_account">PK_Account</string>
@@ -141,6 +141,8 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="pick_gateway">Select A Gateway</string>
+    <string name="port">port_3480</string>
+    <string name="data_req">data_request?id=sdata</string>
 
 
 </resources>
