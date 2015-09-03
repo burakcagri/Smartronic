@@ -70,6 +70,7 @@ public class MainActivity extends ActionBarActivity {
     String pk_device = "";
     String[] PK_Devices, Internal_Ips;
     CharSequence[] items;
+    Database database;
 
     //String URLLogin = "https://vera-us-oem-autha.mios.com/autha/auth/username/";
     //String getTheDevices = "https://vera-us-oem-authd.mios.com/locator/locator/";
@@ -92,7 +93,7 @@ public class MainActivity extends ActionBarActivity {
         registerBroadcastReceiver();
         registerUIReceiver();
         Methods methods = new Methods(getApplicationContext());
-        final Database database = new Database(getApplicationContext());
+        database = new Database(getApplicationContext());
 
         registeredUsername = "burak";
 
@@ -244,7 +245,7 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //showLoadingDialog();
+            showLoadingDialog();
         }
 
         public void showLoadingDialog() {
@@ -347,7 +348,7 @@ public class MainActivity extends ActionBarActivity {
 
                         System.out.println("Post Data String rolls in here \n" + postDataString(linkedHashMap));
                         int responseCode = conn.getResponseCode();
-                        System.out.println(responseCode);
+                        System.out.println("RESPONSE CODE IS: " + responseCode);
                         setResponseCode(responseCode);
 
                         System.out.println("reader a geldi");
@@ -536,62 +537,6 @@ public class MainActivity extends ActionBarActivity {
         alert.show();
     }
 
-
-
-        /*private void remoteOrLocalConnection() {
-
-            String type = getConnectionType();
-            String server_relay_mmsSession = "";
-            String PK_Device = "";
-
-            if (type.equals(getString(R.string.mobile))) {
-                // Connect Remotely
-                StringBuilder stringBuilder = new StringBuilder("https://" + serverDevice + URLMap.get("5").toString() + PK_Device);
-                URLMap.put("5", stringBuilder);
-                postData.put("", "");
-                String response = handleURLConnections(URLMap.get("5"), postData, "1", "GET");
-                if (responseCode == 200) {
-                    serverRelay = processTheData(3, response);
-
-                    postData.clear();
-
-                    StringBuilder stringBuilder2 = new StringBuilder("https://" + serverRelay + URLMap.get("7").toString());
-                    URLMap.put("7", stringBuilder2);
-                    postData.put("", "");
-                    String response2 = handleURLConnections(URLMap.get("7"), postData, "2", "GET");
-                    server_relay_mmsSession = processTheData(4, response2);
-                    StringBuilder stringBuilder1 = new StringBuilder("https://" + serverRelay + URLMap.get("6") + PK_Device +
-                            "/session/" + server_relay_mmsSession + "port_3480/");
-                    URLMap.put("6", stringBuilder1);
-                    postData.put("id", "sdata");
-                    String dataResponse = handleURLConnections(URLMap.get("6"), postData, "1", "GET");
-                    String processedDataResponse = processTheData(4, dataResponse);
-
-                    postData.clear();
-                } else {
-                    StringBuilder stringBuilder1 = new StringBuilder(URLMap.get("4") + PK_Device + "/port_3480");
-                    URLMap.put("4", stringBuilder1);
-                }
-            } else if (type.equals(getString(R.string.wifi))) {
-                // Connect via InternalIp
-                StringBuilder stringBuilder = new StringBuilder(URLMap.get("4") + InternalIp + "/port_3480");
-                URLMap.put("4", stringBuilder);
-
-                StringBuilder stringBuilder1 = new StringBuilder("https://" + serverRelay + URLMap.get("6") + PK_Device +
-                        "/session/" + server_relay_mmsSession + "port_3480/");
-
-                URLMap.put("6", stringBuilder1);
-                postData.put("id", "sdata");
-                String dataResponse = handleURLConnections(URLMap.get("6"), postData, "1", "GET");
-                String processedDataResponse = processTheData(4, dataResponse);
-            } else {
-                // No Connection
-                System.out.println("No Connection");
-            }
-
-        }*/
-
-
     @Override
     protected void onDestroy() {
         this.isStopped = true;
@@ -715,21 +660,16 @@ public class MainActivity extends ActionBarActivity {
                 postData.clear();
                 System.out.println("LOCAL CONNECTION URL " + sb.toString());
                 String response = loginCheck.handleURLConnections(sb, postData, "1", "GET");
-                System.out.println("THIS IS THE LOCAL CONNECTION RESPONSE: " + response);
                 if (responseCode == 200) {
-                    serverRelay = loginCheck.processTheData(3, response);
-
-                    postData.clear();
-
-                    StringBuilder stringBuilder = new StringBuilder("https://");
-                    stringBuilder.append(serverRelay);
-                    stringBuilder.append(URLMap.get("7"));
-                    URLMap.put("7", stringBuilder);
-                    postData.put("", "");
-                    String response2 = loginCheck.handleURLConnections(URLMap.get("7"), postData, "2", "GET");
-                    server_relay_mmsSession = loginCheck.processTheData(4, response2);
-
-                    postData.clear();
+                    try {
+                        System.out.println("SIKERIM BELANI YAVSAK");
+                        setLocalConnectionData(response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Intent intent = new Intent(context, Index.class);
+                    intent.putExtra("response" , response);
+                    startActivity(intent);
                 } else {
                     URLMap.put("4", URLMap.get("4").append(String.valueOf(pk_device)).append("/port_3480"));
                 }
@@ -737,24 +677,94 @@ public class MainActivity extends ActionBarActivity {
                 //Connect Locally
                 URLMap.put("4", URLMap.get("4").append(InternalIp).append("/port_3480"));
             }
-            StringBuilder stringBuilder = new StringBuilder("https://" + serverRelay + URLMap.get("6").toString() + String.valueOf(pk_device) +
-                    "/session/" + server_relay_mmsSession + "port_3480/");
-            URLMap.put("6", stringBuilder);
-            postData.put("id", "sdata");
-            String dataResponse = loginCheck.handleURLConnections(URLMap.get("6"), postData, "1", "GET");
-            String processedDataResponse = loginCheck.processTheData(4, dataResponse);
+            loginCheck.dismissLoadingDialog();
             return null;
+
+        }
+
+    }
+
+    public void setLocalConnectionData(String response) throws JSONException {
+        JSONObject jsonObject = new JSONObject(response);
+        String full, version, model, zwave_heal, temperature, skin, serial_number, fwd1, fwd2, mode,
+                ir, irtx, loadtime, dataversion, state, comment;
+        full = jsonObject.getString("full");
+        version = jsonObject.getString("version");
+        model = jsonObject.getString("model");
+        zwave_heal = jsonObject.getString("zwave_heal");
+        temperature = jsonObject.getString("temperature");
+        skin = jsonObject.getString("skin");
+        serial_number = jsonObject.getString("serial_number");
+        fwd1 = jsonObject.getString("fwd1");
+        fwd2 = jsonObject.getString("fwd2");
+        mode = jsonObject.getString("mode");
+        ir = jsonObject.getString("ir");
+        irtx = jsonObject.getString("irtx");
+        loadtime = jsonObject.getString("loadtime");
+        dataversion = jsonObject.getString("dataversion");
+        state = jsonObject.getString("state");
+        comment = jsonObject.getString("comment");
+
+        String sections = jsonObject.getString("sections");
+        String rooms = jsonObject.getString("rooms");
+        String scenes = jsonObject.getString("scenes");
+        String devices = jsonObject.getString("devices");
+        String categories = jsonObject.getString("categories");
+
+        JSONArray sectionsJsonArray = new JSONArray(sections);
+        JSONArray roomsJsonArray = new JSONArray(rooms);
+        JSONArray scenesJsonArray = new JSONArray(scenes);
+        JSONArray devicesJsonArray = new JSONArray(devices);
+        //System.out.println("BEN SENIN TA GOTUNU SIKIYIM " + devicesJsonArray.length() + " " + devicesJsonArray);
+        //System.out.println("JSON OBJECT NAME: " + (devicesJsonArray.getJSONObject(0)).getString("name"));
+        JSONArray categoriesJsonArray = new JSONArray(categories);
+
+        for (int a = 0; a < sectionsJsonArray.length(); a++) {
+            JSONObject JsonObject = sectionsJsonArray.getJSONObject(a);
+            database.insertSectionsData(JsonObject.getString("name"), JsonObject.getString("id"));
+            //System.out.println("OHA AMK: " + JsonObject.getString("name"));
+        }
+
+        for (int b = 0; b < roomsJsonArray.length(); b++) {
+            JSONObject JsonObject = roomsJsonArray.getJSONObject(b);
+            database.insertRoomsData(JsonObject.getString("name"), JsonObject.getString("id"),
+                    JsonObject.getInt("section"));
+            //System.out.println("OHA AMK: " + JsonObject.getString("name"));
+            //System.out.println("OHA AMK: " + JsonObject.getString("id"));
+            //System.out.println("OHA AMK: " + JsonObject.getString("section"));
+        }
+
+        for (int i = 0; i < scenesJsonArray.length(); i++) {
+            JSONObject JsonObject = scenesJsonArray.getJSONObject(i);
+            database.insertScenesData(JsonObject.getString("active"), JsonObject.getString("name"),
+                    JsonObject.getString("id"), JsonObject.getString("room"));
+            //System.out.println("OHA AMK: " + JsonObject.getString("name"));
+        }
+
+
+        for (int j = 0; j < devicesJsonArray.length(); j++) {
+            JSONObject JsonObject = devicesJsonArray.getJSONObject(j);
+            System.out.println("OHA AMK: " + (devicesJsonArray.getJSONObject(j).getString("category")));
+            if ((devicesJsonArray.getJSONObject(j).getString("category")).equals("3")) {
+                database.insertSwitchData(JsonObject.getString("name"), JsonObject.getString("altid"),
+                        JsonObject.getString("id"), (devicesJsonArray.getJSONObject(j).getString("category")),
+                        JsonObject.getString("subcategory"), JsonObject.getString("room"), JsonObject.getString("parent"),
+                        JsonObject.getString("status"), JsonObject.getString("kwh"), JsonObject.getString("watts"),
+                        JsonObject.getString("state"), JsonObject.getString("comment"));
+            } else if ((devicesJsonArray.getJSONObject(j).getString("category")).equals("6")) {
+                database.insertCameraData(JsonObject.getString("name"), JsonObject.getString("altid"),
+                        JsonObject.getString("id"), JsonObject.getString("category"), JsonObject.getString("subcategory"),
+                        JsonObject.getString("room"), JsonObject.getString("parent"), JsonObject.getString("ip"),
+                        JsonObject.getString("url"), JsonObject.getString("streaming"), JsonObject.getString("commands"),
+                        JsonObject.getString("videourls"), JsonObject.getString("state"), JsonObject.getString("comment"));
+            }
+        }
+
+        for (int k = 0; k < categoriesJsonArray.length(); k++) {
+            JSONObject JsonObject = categoriesJsonArray.getJSONObject(k);
+            database.insertCategoriesData(JsonObject.getString("name"), JsonObject.getString("id"));
+            //System.out.println("OHA AMK: " + JsonObject.getString("name"));
         }
     }
+
 }
-
-/*
-
-if (responseCode == 200) {
-                    dismissLoadingDialog();
-                    Intent intent = new Intent(getApplicationContext(), Index.class);
-                    startActivity(intent);
-                } else {
-                    System.exit(0);
-                }
- */

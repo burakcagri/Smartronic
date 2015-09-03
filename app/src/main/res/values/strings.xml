@@ -91,7 +91,7 @@
     // Database Strings
 
     <string name="user_table">user</string>
-    <string name="room_table">room</string>
+    <string name="room_table">rooms</string>
     <string name="home_table">home</string>
     <string name="security_table">security</string>
     <string name="heater_table">heater</string>

@@ -1,23 +1,19 @@
 package smarthouse.smartronic2;
 
-/**
- * Created by burak on 19/03/15.
- */
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+/**
+ * Created by burak on 03/09/15.
+ */
 public class Database extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
 
-    private static final String DATABASE_NAME = "Smartronic";
+    private static final String DATABASE_NAME = "Veritabani";
 
     String SCENES = "scenes";
     String CATEGORIES = "categories";
@@ -50,43 +46,40 @@ public class Database extends SQLiteOpenHelper {
     String ROOM_ID = "room_id";
     String NAME = "name";
 
-
     public Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        String CREATE_ROOM = "CREATE TABLE" + " " + ROOMS + "(" + ROOM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME
+        String CREATE_ROOM = "CREATE TABLE " + ROOMS + " (" + ROOM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME
                 + " TEXT," + ID + " TEXT," + SECTION + " TEXT)";
         db.execSQL(CREATE_ROOM);
 
-        String CREATE_CAMERA = "CREATE TABLE" + " " + CAMERA + "(" + CAMERA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
+        String CREATE_CAMERA = "CREATE TABLE " + " " + CAMERA + " (" + CAMERA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
                 " TEXT," + ALTID + " TEXT," + ID + " TEXT," + VIDEO_URLS + " TEXT," + CATEGORY + " TEXT," + SUBCATEGORY +
-                " TEXT," + ROOM + " TEXT," + PARENT + " TEXT," + IP + " TEXT," + STREAMING + " TEXT," + URL + " TEXT," +
+                " TEXT," + ROOM + " TEXT," + PARENT + " TEXT," + IP + " TEXT," + STREAMING + " TEXT," + URL + " TEXT" +
                 ")";
         db.execSQL(CREATE_CAMERA);
 
-        String CREATE_CATEGORIES = "CREATE TABLE" + " " + CATEGORIES + "(" + CAMERA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
+        String CREATE_CATEGORIES = "CREATE TABLE " + " " + CATEGORIES + " (" + CAMERA_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
                 " TEXT," + ID + " TEXT)";
         db.execSQL(CREATE_CATEGORIES);
 
-        String CREATE_SWITCH = "CREATE TABLE" + " " + SWITCH + "(" + SWITCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
+        String CREATE_SWITCH = "CREATE TABLE" + SWITCH + "(" + SWITCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
                 " TEXT," + ALTID + " TEXT," + ID + " TEXT," + CATEGORY + " TEXT," + SUBCATEGORY + " TEXT," + ROOM +
                 " TEXT," + PARENT + " TEXT," + STATUS + " TEXT," + KWH + " TEXT," + WATTS + " TEXT," + STATE + " TEXT," + COMMENT + " TEXT" +
                 ")";
         db.execSQL(CREATE_SWITCH);
 
-        String CREATE_SECTIONS = "CREATE TABLE" + " " + SECTIONS + "(" + SECTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
+        String CREATE_SECTIONS = "CREATE TABLE " + SECTIONS + " (" + SECTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
                 " TEXT," + ID + " TEXT)";
         db.execSQL(CREATE_SECTIONS);
 
-        String CREATE_SCENES = "CREATE TABLE" + " " + SCENES + "(" + SCENE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
+        String CREATE_SCENES = "CREATE TABLE " + " " + SCENES + " (" + SCENE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
                 " TEXT," + ID + " TEXT," + ROOM + " TEXT," + ACTIVE + " TEXT)";
         db.execSQL(CREATE_SCENES);
-
 
     }
 
@@ -141,7 +134,7 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public int getRowCount(String table) {
-        String countQuery = "SELECT  * FROM " + table;
+        String countQuery = "SELECT * FROM " + table;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int rowCount = cursor.getCount();
@@ -158,5 +151,64 @@ public class Database extends SQLiteOpenHelper {
         db.close();
         cursor.close();
         return response;
+    }
+
+    public void insertSectionsData(String name, String id) {
+    }
+
+    public void insertRoomsData(String name, String id, int section) {
+    }
+
+    public void insertScenesData(String active, String name, String id, String room) {
+    }
+
+    public void insertCategoriesData(String name, String id) {
+    }
+
+    public void insertSwitchData(String name, String altid, String id, String category, String subcategory, String room,
+                                 String parent, String status, String kwh, String watts, String state, String comment) {
+
+        System.out.println("DATABASE NAME IS: " + this.getDatabaseName());
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        if (!checkAlreadyHas(id, SWITCH)) {
+            values.put(NAME, name);
+            values.put(ALTID, altid);
+            values.put(ID, id);
+            values.put(CATEGORY, category);
+            values.put(SUBCATEGORY, subcategory);
+            values.put(ROOM, room);
+            values.put(PARENT, parent);
+            values.put(STATUS, status);
+            values.put(KWH, kwh);
+            values.put(WATTS, watts);
+            values.put(STATE, state);
+            values.put(COMMENT, comment);
+            database.insert(SWITCH, null, values);
+        }
+        database.close();
+
+    }
+
+    @Override
+    public String getDatabaseName() {
+        return super.getDatabaseName();
+    }
+
+    private boolean checkAlreadyHas(String id, String table) {
+        boolean response = false;
+        String countQuery = "SELECT * FROM " + table + " WHERE id=" + id;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int rowCount = cursor.getCount();
+        if (rowCount > 0) {
+            response = true;
+        }
+        cursor.close();
+        return response;
+    }
+
+    public void insertCameraData(String name, String altid, String id, String category, String subcategory, String room, String parent, String ip, String url, String streaming, String commands, String videourls, String state, String comment) {
     }
 }

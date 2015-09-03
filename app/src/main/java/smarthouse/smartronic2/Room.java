@@ -8,15 +8,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -29,7 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class Room extends Activity {
+public class Room extends ActionBarActivity {
 
     //String dataURL = "/data_request?id=lu_sdata&loadtime=0&dataversion=0";
 
@@ -50,6 +57,12 @@ public class Room extends Activity {
     ArrayList heaterNamesArray = new ArrayList();
     ArrayList lampNamesArray = new ArrayList();
 
+    private ListView mDrawerList;
+    private ArrayAdapter<String> mAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private DrawerLayout mDrawerLayout;
+    private String mActivityTitle;
+
     //finish();
     //startActivity(getIntent()); THIS CODE REFRESHES THE ACTIVITY
 
@@ -63,10 +76,70 @@ public class Room extends Activity {
         database = new Database(getApplicationContext());
         methods = new Methods(getApplicationContext());
 
+        mDrawerList = (ListView) findViewById(R.id.navList);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        addDrawerItems();
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mActivityTitle = getTitle().toString();
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+                R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle("Navigation!");
+                invalidateOptionsMenu();
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle(mActivityTitle);
+                invalidateOptionsMenu();
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    Intent intent = new Intent(getApplicationContext(), Index.class);
+                    startActivity(intent);
+                }
+                if (position == 1) {
+                    Intent intent = new Intent(getApplicationContext(), Room.class);
+                    startActivity(intent);
+                }
+                if (position == 2) {
+                    Intent intent = new Intent(getApplicationContext(), Room.class);
+                    startActivity(intent);
+                }
+                if (position == 3) {
+                    Intent intent = new Intent(getApplicationContext(), Security.class);
+                    startActivity(intent);
+                }
+                if (position == 4) {
+                    Intent intent = new Intent(getApplicationContext(), Room.class);
+                    startActivity(intent);
+                }
+                if (position == 5) {
+                    moveTaskToBack(true);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(1);
+                }
+            }
+        });
+
+
         SharedPreferences mPrefs = getSharedPreferences("rooms", MODE_PRIVATE);
-        Button button = (Button) findViewById(R.id.kitchenTextView);
-        button.setText(mPrefs.getString("room1", ""));
-        button.setBackgroundResource(R.drawable.circle);
+        //Button button = (Button) findViewById(R.id.kitchenTextView);
+        //button.setText(mPrefs.getString("room1", ""));
+        //button.setBackgroundResource(R.drawable.circle);
         registerBroadcastReceiver();
         //dynamically update xml
         context = getApplicationContext();
@@ -105,11 +178,11 @@ public class Room extends Activity {
         } else {
             for (int i = 0; i < numberOfRooms; i++) {
                 // in this place, buttons will be added
-                createButton("erfv", R.id.linearLayout, "rferv", true, i);
+                //createButton("erfv", R.id.linearLayout, "rferv", true, i);
             }
 
             // How it will be implemented to my previous algorithm?
-            kidRoomButton = (Button) findViewById(R.id.kidRoomTextView);
+            //kidRoomButton = (Button) findViewById(R.id.kidRoomTextView);
 
             /*String internalIp = ma.InternalIp;
             dataURL = internalIp + dataURL;
@@ -147,6 +220,12 @@ public class Room extends Activity {
     }
 
     @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -156,6 +235,15 @@ public class Room extends Activity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        else if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        else {
+            Toast toast = Toast.makeText(context, "an error occurred!", Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -205,10 +293,10 @@ public class Room extends Activity {
         Iterator entries = user.entrySet().iterator();
         //System.out.println("Clicked layouts are:" + user.size());
         View view = findViewById(i);
-        View view1 = findViewById(R.id.sample);
+        //View view1 = findViewById(R.id.sample);
 
         if (!entries.hasNext()) {
-            view1.setVisibility(View.GONE);
+            //view1.setVisibility(View.GONE);
             addViewStubArray(name, i);
             view.setVisibility(View.VISIBLE);
         }
@@ -278,10 +366,10 @@ public class Room extends Activity {
                             JSONObject jsonObject;
                             jsonObject = new JSONObject(intent.getStringExtra("data"));
                             Toast.makeText(getApplication(), "polling data", Toast.LENGTH_SHORT).show();
-                            Button button = (Button) findViewById(R.id.kitchenTextView);
+                            //Button button = (Button) findViewById(R.id.kitchenTextView);
                             SharedPreferences mPrefs = getSharedPreferences("rooms", MODE_PRIVATE);
                             SharedPreferences.Editor ed = mPrefs.edit();
-                            button.setText(jsonObject.getString("key"));
+                            //button.setText(jsonObject.getString("key"));
                             ed.putString("room1", jsonObject.getString("key"));
                             ed.apply();
 
@@ -326,5 +414,11 @@ public class Room extends Activity {
 
     public void getPolllingUpdate(int type, LinkedHashMap linkedHashMap) {
         // this function will get the data from the mios and operate according to it.
+    }
+
+    private void addDrawerItems() {
+        String[] osArray = {"Devices", "Rooms", "Scenes", "Security", "Settings", "Exit"};
+        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, osArray);
+        mDrawerList.setAdapter(mAdapter);
     }
 }

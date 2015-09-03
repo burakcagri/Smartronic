@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 
 public class Index extends ActionBarActivity {
 
@@ -30,6 +32,7 @@ public class Index extends ActionBarActivity {
     private DrawerLayout mDrawerLayout;
     private String mActivityTitle;
     private Context context;
+    String response = "";
 
     public final static String EXTRA_MESSAGE = "extra message!";
 
@@ -37,7 +40,7 @@ public class Index extends ActionBarActivity {
     protected void onCreate(Bundle onRestoreInstanceState) {
         super.onCreate(onRestoreInstanceState);
         setContentView(R.layout.activity_index);
-        context = getApplicationContext();
+        context = this.getApplicationContext();
         mDrawerList = (ListView) findViewById(R.id.navList);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -73,32 +76,33 @@ public class Index extends ActionBarActivity {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0 ) {
+                if (position == 0) {
                     Intent intent = new Intent(getApplicationContext(), Index.class);
                     startActivity(intent);
                 }
-                if (position == 1 ) {
+                if (position == 1) {
                     Intent intent = new Intent(getApplicationContext(), Room.class);
                     startActivity(intent);
                 }
-                if (position == 2 ) {
+                if (position == 2) {
                     Intent intent = new Intent(getApplicationContext(), Room.class);
                     startActivity(intent);
                 }
-                if (position == 3 ) {
+                if (position == 3) {
                     Intent intent = new Intent(getApplicationContext(), Security.class);
                     startActivity(intent);
                 }
-                if (position == 4 ) {
+                if (position == 4) {
                     Intent intent = new Intent(getApplicationContext(), Room.class);
                     startActivity(intent);
                 }
-                if (position == 5 ) {
-                    System.exit(0);
+                if (position == 5) {
+                    moveTaskToBack(true);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(1);
                 }
             }
         });
-
     }
 
     @Override
@@ -184,7 +188,7 @@ public class Index extends ActionBarActivity {
     }
 
     private void addDrawerItems() {
-        String[] osArray = {"Devices", "Rooms", "Scenes", "Security", "Settings", "Logout"};
+        String[] osArray = {"Devices", "Rooms", "Scenes", "Security", "Settings", "Exit"};
         mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, osArray);
         mDrawerList.setAdapter(mAdapter);
     }

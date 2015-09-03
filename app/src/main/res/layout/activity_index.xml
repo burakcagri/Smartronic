@@ -23,7 +23,6 @@
             android:layout_centerVertical="true"
             android:background="@drawable/rounded_layout"></LinearLayout>
 
-
     </RelativeLayout>
 
     <ListView
