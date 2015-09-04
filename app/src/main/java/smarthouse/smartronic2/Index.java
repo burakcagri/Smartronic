@@ -2,6 +2,7 @@ package smarthouse.smartronic2;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
@@ -9,12 +10,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,6 +36,10 @@ public class Index extends ActionBarActivity {
     private String mActivityTitle;
     private Context context;
     String response = "";
+    int numberOfDevices, generatedButtonId = 0;
+    Database database;
+    Methods methods;
+    int switchCount, cameraCount = 0;
 
     public final static String EXTRA_MESSAGE = "extra message!";
 
@@ -40,7 +47,11 @@ public class Index extends ActionBarActivity {
     protected void onCreate(Bundle onRestoreInstanceState) {
         super.onCreate(onRestoreInstanceState);
         setContentView(R.layout.activity_index);
+
         context = this.getApplicationContext();
+        database = new Database(context);
+        methods = new Methods(context);
+
         mDrawerList = (ListView) findViewById(R.id.navList);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -51,14 +62,18 @@ public class Index extends ActionBarActivity {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
                 R.string.drawer_open, R.string.drawer_close) {
 
-            /** Called when a drawer has settled in a completely open state. */
+            /**
+             * Called when a drawer has settled in a completely open state.
+             */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Navigation!");
+                getSupportActionBar().setTitle("Side Bar Menu");
                 invalidateOptionsMenu();
             }
 
-            /** Called when a drawer has settled in a completely closed state. */
+            /**
+             * Called when a drawer has settled in a completely closed state.
+             */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 getSupportActionBar().setTitle(mActivityTitle);
@@ -103,6 +118,48 @@ public class Index extends ActionBarActivity {
                 }
             }
         });
+
+
+        String devicesLength = methods.getSPreferences("Devices", "numberOfDevices", context);
+        numberOfDevices = Integer.parseInt(devicesLength);
+        System.out.println("NUMBER OF DEVICES IS " + numberOfDevices);
+
+        if (numberOfDevices == 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(Index.this);
+            builder.setMessage(getString(R.string.no_device) + getString(R.string.wish_exit))
+                    .setTitle(getString(R.string.exit))
+                    .setCancelable(false);
+            builder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    moveTaskToBack(true);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    System.exit(1);
+                }
+            });
+
+            builder.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(context, getString(R.string.returning), Toast.LENGTH_SHORT).show();
+                }
+            });
+            AlertDialog alertdialog = builder.create();
+            alertdialog.show();
+        } else {
+            int categoryId = 0;
+            String categoryName = "";
+            for (int i = 0; i < numberOfDevices; i++) {
+                // in this place, buttons will be added
+                categoryName = database.categoryNames();
+                if (categoryName.equals("On/Off Switch")) {
+                    switchCount = database.getRowCount("switch");
+                } else if (categoryName.equals("Camera")) {
+                    cameraCount = database.getRowCount("camera");
+                }
+                createButton("erfv", R.id.deviceCategories, categoryName);
+            }
+        }
     }
 
     @Override
@@ -194,5 +251,24 @@ public class Index extends ActionBarActivity {
     }
 
     private void setupDrawer() {
+    }
+
+    private void createButton(String key, int linearLayoutId, String text) {
+
+        LinearLayout linearLayout = (LinearLayout) findViewById(linearLayoutId);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        params.leftMargin = 50;
+        generatedButtonId = View.generateViewId();
+        Button button = new Button(new ContextThemeWrapper(context, R.style.circle_texts), null, 0);
+        button.setBackgroundResource(R.drawable.circle);
+        button.setId(View.generateViewId());
+        //text = database.getRoomText(String.valueOf(j));
+        button.setText(text);
+        button.setGravity(17);
+        button.setLayoutParams(params);
+        linearLayout.addView(button);
+        //database.setLayoutId(generatedButtonId, name);
+
     }
 }

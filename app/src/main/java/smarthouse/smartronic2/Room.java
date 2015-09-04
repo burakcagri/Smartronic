@@ -89,7 +89,7 @@ public class Room extends ActionBarActivity {
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle("Navigation!");
+                getSupportActionBar().setTitle("Side Bar Menu");
                 invalidateOptionsMenu();
             }
 
@@ -178,7 +178,7 @@ public class Room extends ActionBarActivity {
         } else {
             for (int i = 0; i < numberOfRooms; i++) {
                 // in this place, buttons will be added
-                //createButton("erfv", R.id.linearLayout, "rferv", true, i);
+                //createButton("erfv", R.id.deviceCategories, "rferv", true, i);
             }
 
             // How it will be implemented to my previous algorithm?

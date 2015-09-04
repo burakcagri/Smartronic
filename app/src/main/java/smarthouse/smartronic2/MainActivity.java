@@ -71,6 +71,7 @@ public class MainActivity extends ActionBarActivity {
     String[] PK_Devices, Internal_Ips;
     CharSequence[] items;
     Database database;
+    Methods methods;
 
     //String URLLogin = "https://vera-us-oem-autha.mios.com/autha/auth/username/";
     //String getTheDevices = "https://vera-us-oem-authd.mios.com/locator/locator/";
@@ -92,7 +93,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         registerBroadcastReceiver();
         registerUIReceiver();
-        Methods methods = new Methods(getApplicationContext());
+        methods = new Methods(getApplicationContext());
         database = new Database(getApplicationContext());
 
         registeredUsername = "burak";
@@ -336,7 +337,7 @@ public class MainActivity extends ActionBarActivity {
                         }
                         stringBuilder.append(postDataString(linkedHashMap).toString());
                         URL url = new URL(stringBuilder.toString());
-                        System.out.println("URL Link is Here \n" + inputUrl.toString());
+                        //System.out.println("URL Link is Here \n" + inputUrl.toString());
 
                         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                         conn.setRequestMethod(type);
@@ -346,7 +347,7 @@ public class MainActivity extends ActionBarActivity {
                         conn.connect();
 
 
-                        System.out.println("Post Data String rolls in here \n" + postDataString(linkedHashMap));
+                        //System.out.println("Post Data String rolls in here \n" + postDataString(linkedHashMap));
                         int responseCode = conn.getResponseCode();
                         System.out.println("RESPONSE CODE IS: " + responseCode);
                         setResponseCode(responseCode);
@@ -358,7 +359,7 @@ public class MainActivity extends ActionBarActivity {
 
                         while ((line = reader.readLine()) != null) {
                             stringBuilder2.append(line);
-                            System.out.println("BASTI MI BURAYI" + stringBuilder2.toString());
+                            //System.out.println("BASTI MI BURAYI" + stringBuilder2.toString());
                         }
                         reader.close();
 
@@ -668,7 +669,7 @@ public class MainActivity extends ActionBarActivity {
                         e.printStackTrace();
                     }
                     Intent intent = new Intent(context, Index.class);
-                    intent.putExtra("response" , response);
+                    intent.putExtra("response", response);
                     startActivity(intent);
                 } else {
                     URLMap.put("4", URLMap.get("4").append(String.valueOf(pk_device)).append("/port_3480"));
@@ -743,9 +744,19 @@ public class MainActivity extends ActionBarActivity {
 
 
         for (int j = 0; j < devicesJsonArray.length(); j++) {
+
             JSONObject JsonObject = devicesJsonArray.getJSONObject(j);
-            System.out.println("OHA AMK: " + (devicesJsonArray.getJSONObject(j).getString("category")));
+            System.out.println("DEVICES JSON ARRAY LENGTH: " + devicesJsonArray.length());
+            methods.createSPreferences("Devices", context);
+            methods.updateSPreferences("numberOfDevices", String.valueOf(devicesJsonArray.length()), "Devices", context);
+
+            //System.out.println("OHA AMK: " + (devicesJsonArray.getJSONObject(j).getString("category")));
+
             if ((devicesJsonArray.getJSONObject(j).getString("category")).equals("3")) {
+
+                database.insertDevices("", JsonObject.getString("name"),
+                        (devicesJsonArray.getJSONObject(j).getString("category")));
+
                 database.insertSwitchData(JsonObject.getString("name"), JsonObject.getString("altid"),
                         JsonObject.getString("id"), (devicesJsonArray.getJSONObject(j).getString("category")),
                         JsonObject.getString("subcategory"), JsonObject.getString("room"), JsonObject.getString("parent"),

@@ -98,6 +98,7 @@
     <string name="plug_table">plug</string>
     <string name="database_name">Smartronic</string>
     <string name="no_room">Sorry there are no rooms registered to your account..</string>
+    <string name="no_device">Sorry there are no devices registered to your account..</string>
     <string name="exit_the_app">Are you sure you want to exit?</string>
     <string name="exit">Exit</string>
     <string name="wish_exit">Do you wish to exit?</string>
@@ -143,6 +144,7 @@
     <string name="pick_gateway">Select A Gateway</string>
     <string name="port">port_3480</string>
     <string name="data_req">data_request?id=sdata</string>
+    <string name="categories_table">categories</string>
 
 
 </resources>

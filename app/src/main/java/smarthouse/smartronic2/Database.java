@@ -15,36 +15,39 @@ public class Database extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Veritabani";
 
-    String SCENES = "scenes";
-    String CATEGORIES = "categories";
-    String SWITCH = "switch";
-    String ROOMS = "rooms";
-    String CAMERA = "camera";
-    String SECTIONS = "sections";
+    private String SCENES = "scenes";
+    private String CATEGORIES = "categories";
+    private String SWITCH = "switch";
+    private String ROOMS = "rooms";
+    private String CAMERA = "camera";
+    private String SECTIONS = "sections";
 
-    String ID = "id";
-    String STATUS = "status";
-    String SECTION = "section";
-    String ROOM = "room";
-    String ACTIVE = "active";
-    String SECTION_ID = "section_id";
-    String SWITCH_ID = "switch_id";
-    String SCENE_ID = "scene_id";
-    String CAMERA_ID = "camera_id";
-    String ALTID = "altid";
-    String VIDEO_URLS = "videourls";
-    String CATEGORY = "category";
-    String SUBCATEGORY = "subcategory";
-    String PARENT = "parent";
-    String IP = "ip";
-    String STREAMING = "streaming";
-    String URL = "url";
-    String KWH = "kwh";
-    String WATTS = "watts";
-    String STATE = "state";
-    String COMMENT = "comment";
-    String ROOM_ID = "room_id";
-    String NAME = "name";
+    private String ID = "id";
+    private String STATUS = "status";
+    private String SECTION = "section";
+    private String ROOM = "room";
+    private String ACTIVE = "active";
+    private String SECTION_ID = "section_id";
+    private String SWITCH_ID = "switch_id";
+    private String SCENE_ID = "scene_id";
+    private String CAMERA_ID = "camera_id";
+    private String ALTID = "altid";
+    private String VIDEO_URLS = "videourls";
+    private String CATEGORY = "category";
+    private String SUBCATEGORY = "subcategory";
+    private String PARENT = "parent";
+    private String IP = "ip";
+    private String STREAMING = "streaming";
+    private String URL = "url";
+    private String KWH = "kwh";
+    private String WATTS = "watts";
+    private String STATE = "state";
+    private String COMMENT = "comment";
+    private String ROOM_ID = "room_id";
+    private String NAME = "name";
+    private String DEVICES = "devices";
+    private String DEVICE_ID = "device_id";
+    private String XML_ID = "xml_id";
 
     public Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -67,7 +70,7 @@ public class Database extends SQLiteOpenHelper {
                 " TEXT," + ID + " TEXT)";
         db.execSQL(CREATE_CATEGORIES);
 
-        String CREATE_SWITCH = "CREATE TABLE" + SWITCH + "(" + SWITCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
+        String CREATE_SWITCH = "CREATE TABLE " + SWITCH + "(" + SWITCH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
                 " TEXT," + ALTID + " TEXT," + ID + " TEXT," + CATEGORY + " TEXT," + SUBCATEGORY + " TEXT," + ROOM +
                 " TEXT," + PARENT + " TEXT," + STATUS + " TEXT," + KWH + " TEXT," + WATTS + " TEXT," + STATE + " TEXT," + COMMENT + " TEXT" +
                 ")";
@@ -80,6 +83,10 @@ public class Database extends SQLiteOpenHelper {
         String CREATE_SCENES = "CREATE TABLE " + " " + SCENES + " (" + SCENE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + NAME +
                 " TEXT," + ID + " TEXT," + ROOM + " TEXT," + ACTIVE + " TEXT)";
         db.execSQL(CREATE_SCENES);
+
+        String CREATE_DEVICES = "CREATE TABLE " + " " + DEVICES + " (" + DEVICE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + XML_ID +
+                " TEXT," + NAME + " TEXT," + CATEGORY + " TEXT)";
+        db.execSQL(CREATE_DEVICES);
 
     }
 
@@ -163,12 +170,21 @@ public class Database extends SQLiteOpenHelper {
     }
 
     public void insertCategoriesData(String name, String id) {
+
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        if (!checkAlreadyHas(id, CATEGORIES)) {
+            values.put(NAME, name);
+            values.put(ID, id);
+            database.insert(CATEGORIES, null, values);
+        }
+        database.close();
     }
 
     public void insertSwitchData(String name, String altid, String id, String category, String subcategory, String room,
                                  String parent, String status, String kwh, String watts, String state, String comment) {
 
-        System.out.println("DATABASE NAME IS: " + this.getDatabaseName());
         SQLiteDatabase database = this.getWritableDatabase();
         ContentValues values = new ContentValues();
 
@@ -209,6 +225,66 @@ public class Database extends SQLiteOpenHelper {
         return response;
     }
 
+    private boolean checkAlreadyHasName(String name, String table) {
+        boolean response = false;
+        String countQuery = "SELECT * FROM " + table + " WHERE name=" + name;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(countQuery, null);
+        int rowCount = cursor.getCount();
+        if (rowCount > 0) {
+            response = true;
+        }
+        cursor.close();
+        return response;
+    }
+
     public void insertCameraData(String name, String altid, String id, String category, String subcategory, String room, String parent, String ip, String url, String streaming, String commands, String videourls, String state, String comment) {
+    }
+
+    public int categoryIds() {
+        String query = "SELECT id from categories";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        int response = 0;
+        int i = 0;
+        while (cursor.moveToNext()) {
+            String entry = cursor.getString(i);
+            System.out.println("CATEGORY IS:" + entry);
+            response = Integer.parseInt(entry);
+        }
+        db.close();
+        cursor.close();
+        return response;
+    }
+
+    public void insertDevices(String s, String name, String category) {
+        SQLiteDatabase database = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        if (!checkAlreadyHasName(name, DEVICES)) {
+            values.put(XML_ID, s);
+            values.put(NAME, name);
+            values.put(CATEGORY, category);
+            database.insert(DEVICES, null, values);
+        }
+        database.close();
+    }
+
+    public String categoryNames() {
+
+        String query = "SELECT name from categories";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        String response = "";
+        int i = 0;
+        while (cursor.moveToNext()) {
+            response = cursor.getString(i);
+            System.out.println("CATEGORY IS:" + response);
+            i++;
+        }
+        db.close();
+        cursor.close();
+        return response;
+
     }
 }
