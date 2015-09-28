@@ -60,7 +60,6 @@ public class MainActivity extends ActionBarActivity {
     String selectedOption;
     String InternalIp = "";
     String serverDevice = "";
-    String serverRelay = "";
     String identityToken;
     int responseCode = 0;
     Context context;
